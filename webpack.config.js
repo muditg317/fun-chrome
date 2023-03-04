@@ -1,12 +1,14 @@
 const webpack = require("webpack");
 const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const config = {
   entry: {
     popup: path.join(__dirname, "src/popup.tsx"),
     content: path.join(__dirname, "src/scripts/content-script.ts"),
     background: path.join(__dirname, "src/scripts/service-worker.ts"),
+    "fun-chrome-effects": path.join(__dirname, "src/assets/styles/fun-chrome-effects.css"),
   },
   output: { path: path.join(__dirname, "dist"), filename: "[name].js" },
   module: {
@@ -18,8 +20,10 @@ const config = {
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
-        exclude: /\.module\.css$/,
+        use: [
+          "style-loader",
+          "css-loader"],
+        exclude: /(assets\/styles\/.*|\.module)\.css$/,
       },
       {
         test: /\.ts(x)?$/,
@@ -41,6 +45,14 @@ const config = {
         include: /\.module\.css$/,
       },
       {
+        test: /\.css$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader",
+        ],
+        include: /assets\/styles\/.*\.css$/,
+      },
+      {
         test: /\.svg$/,
         use: "file-loader",
       },
@@ -58,7 +70,7 @@ const config = {
     ],
   },
   resolve: {
-    extensions: [".js", ".jsx", ".tsx", ".ts"],
+    extensions: [".js", ".jsx", ".tsx", ".ts", ".css"],
     alias: {
       "react-dom": "@hot-loader/react-dom",
     },
@@ -70,6 +82,7 @@ const config = {
     new CopyPlugin({
       patterns: [{ from: "public", to: "." }],
     }),
+    new MiniCssExtractPlugin()
   ],
 };
 
