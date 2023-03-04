@@ -1,22 +1,26 @@
-.App {
+body {
+  margin: 0;
+}
+
+.popup {
   text-align: center;
 }
 
-.App-logo {
+.popup-logo {
   height: 40vmin;
   pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+  .popup-logo {
+    animation: popup-logo-spin infinite 20s linear;
   }
 }
 
-.App-header {
+.popup-header {
   background-color: #282c34;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
@@ -25,11 +29,11 @@
   padding: 10px;
 }
 
-.App-link {
+.popup-link {
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
+@keyframes popup-logo-spin {
   from {
     transform: rotate(0deg);
   }

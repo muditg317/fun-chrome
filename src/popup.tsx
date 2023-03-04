@@ -1,8 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import App from "./App";
-import "./popup.css";
+import Popup from "./components/popup-main";
 
-var mountNode = document.getElementById("popup");
-ReactDOM.render(<App />, mountNode);
+const mountNode = document.getElementById("popup");
+ReactDOM.render(<Popup />, mountNode);

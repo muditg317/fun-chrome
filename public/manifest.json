@@ -1,6 +1,6 @@
 {
-  "name": "Chrome Extension Boilerplate",
-  "description": "Chrome Extension boilerplate created with React Typescript.",
+  "name": "Fun Chrome",
+  "description": "Make surfing the web more fun",
   "manifest_version": 3,
   "version": "1.0.0",
   "icons": {
@@ -8,18 +8,20 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
-  "browser_action": {
+  "permissions": [
+    "tabs"
+  ],
+  "action": {
     "default_icon": {
       "16": "icon16.png",
       "48": "icon48.png"
     },
+    "default_title": "Fun Chrome!",
     "default_popup": "popup.html"
   },
   "background": {
-    "scripts": [
-      "background.js"
-    ],
-    "persistent": false
+    "service_worker": "background.js",
+    "type": "module"
   },
   "content_scripts": [
     {

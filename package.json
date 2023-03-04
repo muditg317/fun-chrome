@@ -1,7 +1,7 @@
 {
   "name": "Fun Chrome",
   "version": "0.0.1",
-  "description": "Make surfing the web mroe fun",
+  "description": "Make surfing the web more fun",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
