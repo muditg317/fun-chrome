@@ -7,7 +7,8 @@ type num4 = readonly [number, number, number, number];
 
 const useP5Event = (handler: P5Event, bounds: num4) => {
   const [minX, maxX, minY, maxY] = bounds;
-  return useCallback((p5: p5, event: Event) => {
+  return useCallback((p5: p5, evt?: object) => {
+    const event = (evt || window.event) as Event;
     if (minX !== undefined && (p5.mouseX < minX || p5.mouseX > maxX || p5.mouseY < minY || p5.mouseY > maxY)) {
       return;
     }
