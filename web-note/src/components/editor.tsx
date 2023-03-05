@@ -4,7 +4,6 @@ import type p5 from "p5";
 import P5Sketch from "~/components/p5-sketch";
 import dummyImg from "~/assets/dummyImg.png";
 
-
 const WIDTH = 500;
 const HEIGHT = 500;
 const INTERACTION_MARGIN = 5;
@@ -48,7 +47,8 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef }: EditorPro
 
   const setup = useCallback((p5: p5) => {
     canvasRendererRef.current = p5.createCanvas(WIDTH,HEIGHT);
-    console.log(canvasRendererRef.current);
+    // console.log(canvasRendererRef.current.elt);
+    // console.log(parent);
     canvasRendererRef.current.parent(parent);
     p5.noStroke();
     p5.background(backgroundImage);
