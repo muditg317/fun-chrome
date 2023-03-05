@@ -35,14 +35,12 @@ const tools = [
 
 type Tool = typeof tools[number];
 
-function postCanvasToURL(snap: p5.Renderer) {
-  // Convert canvas image to Base64
-  (snap.elt as HTMLCanvasElement).toBlob((blob) => {
-    if (!blob) return;
-    // let file = new File([blob], "fileName.jpg", { type: "image/jpeg" })
-    
+function postCanvasToURL(canvas: HTMLCanvasElement) {
+  canvas.toBlob((blob) => {
+    if (!blob) return;    
     const element = document.createElement('a');
     const url  = window.URL.createObjectURL(blob);
+
     element.setAttribute('href', url);
     element.setAttribute('download', "annotated.jpg");
 
@@ -54,19 +52,6 @@ function postCanvasToURL(snap: p5.Renderer) {
     document.body.removeChild(element);
 
   }, 'image/jpeg');
-  // var img = (snap.elt as HTMLCanvasElement).toDataURL();
-  // console.log(img);
-  
-  // var element = document.createElement('a');
-  // element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(img));
-  // element.setAttribute('download', "annotated.png");
-
-  // element.style.display = 'none';
-  // document.body.appendChild(element);
-
-  // element.click();
-
-  // document.body.removeChild(element);
 }
 
 const Editor: React.FC = () => {
@@ -90,7 +75,7 @@ const Editor: React.FC = () => {
         <div className="flex items-center gap-4">
           <button className="flex items-center gap-2 px-4 py-2 text-white bg-[#727780] rounded-md hover:bg-[#9498a0]"
             onClick={() => {
-              postCanvasToURL(canvasRef.current!);
+              postCanvasToURL(canvasRef.current!.elt as HTMLCanvasElement);
             }}
           >
             <span>Download</span>

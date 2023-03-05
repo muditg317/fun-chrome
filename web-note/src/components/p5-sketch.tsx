@@ -38,6 +38,7 @@ type WithP5Params<T> = {
   [K in keyof T]: addP5Params<T[K]>
 }
 
+type HandlerRecord = WithP5Params<P5EventRecord>;
 
 type P5SketchProps = {
   width: `${number}`,
@@ -45,15 +46,25 @@ type P5SketchProps = {
   id?: string,
   className?: string,
   style?: object,
-} & Partial<WithP5Params<P5EventRecord>>;
+} & Partial<HandlerRecord>;
 
 type addPrefixToObject<T, P extends string> = {
   [K in keyof T as K extends string ? `${P}${K}` : string]: T[K]
 }
 
-type InternalP5EventRecord = addPrefixToObject<WithP5Params<P5EventRecord>, '_internal_'>;
+type InternalP5EventRecord = addPrefixToObject<HandlerRecord, '_internal_'>;
 
 type P5SketchRefType = p5 & Partial<InternalP5EventRecord>;
+
+// function setEvent<T extends keyof HandlerRecord>(sketch: P5SketchRefType, event: T, handler: HandlerRecord[T]) {
+//   sketch[`_internal_${event}`] = handler;
+//   sketch[event] = (...args: Parameters<HandlerRecord[T]>) => {
+//     if (event == "_internal_setup") {
+//       if (sketch.canvas.parentElement) (args as unknown as Parameters<InternalP5EventRecord['_internal_setup']>)[1] = sketch.canvas.parentElement;
+//     }
+//     (handler as unknown as any)?.(sketch, ...(args as any));
+//   };
+// }
 
 export default function P5Sketch(props: P5SketchProps) {
   const {
@@ -67,6 +78,7 @@ export default function P5Sketch(props: P5SketchProps) {
 
   const canvasParentRef = useRef<HTMLDivElement>();
   const sketchRef = useRef<P5SketchRefType>();
+  // const handlerCache = useRef<Partial<HandlerRecord>>({});
 
   useEffect(() => {
     if (!sketchRef.current) {
@@ -75,7 +87,7 @@ export default function P5Sketch(props: P5SketchProps) {
         // console.log(events);
         p5Events.forEach((event) => {
           if (events[event]) {
-            p[`_internal_${event}`] = events[event];
+            (p[`_internal_${event}`] as any) = events[event];
             p[event] = (...args: Parameters<P5EventRecord[typeof event]>) => {
               if (event == "setup") {
                 if (canvasParentRef.current) (args as unknown as Parameters<InternalP5EventRecord['_internal_setup']>)[1] = canvasParentRef.current;
@@ -90,7 +102,7 @@ export default function P5Sketch(props: P5SketchProps) {
       p5Events.forEach((event) => {
         if (events[event] && events[event] !== sketchRef.current?.[`_internal_${event}`]) {
           // console.log(event,"changed");
-          if (sketchRef.current) sketchRef.current[`_internal_${event}`] = events[event];
+          if (sketchRef.current) (sketchRef.current[`_internal_${event}`] as any) = events[event];
         }
       });
     }
