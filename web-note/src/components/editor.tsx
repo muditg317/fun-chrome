@@ -3,6 +3,8 @@ import React, { useCallback } from "react";
 import type p5 from "p5";
 import P5Sketch from "~/components/p5-sketch";
 
+import dummyImg from "~/assets/dummyImg.png";
+
 const WIDTH = 500;
 const HEIGHT = 500;
 
@@ -21,30 +23,37 @@ interface EditorProps {
 
 const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef }: EditorProps) => {
 
-  // const canvas = useRef<p5.Renderer>();
+  let backgroundImage: p5.Image;
 
+  const preload = useCallback((p5: p5) => {
+    backgroundImage = p5.loadImage(dummyImg.src);
+    console.log("preload", backgroundImage);
+  }, []);
+  
   const setup = useCallback((p5: p5, parent: HTMLDivElement) => {
-    console.log("setup");
+    // console.log("setup");
     canvasRendererRef.current = p5.createCanvas(WIDTH,HEIGHT);
-    console.log(canvasRendererRef.current);
+    // console.log(canvasRendererRef.current.elt);
+    // console.log(parent);
     canvasRendererRef.current.parent(parent);
     // const canvasElt = canvasRendererRef.current.elt as HTMLCanvasElement;
     // console.log(canvasElt.isConnected);
     p5.noStroke();
+    p5.background(backgroundImage);
     p5.loop();
   }, [canvasRendererRef]);
 
   const draw = useCallback((p5: p5) => {
-    p5.background(0);
+    // p5.background(0);
     p5.fill(255);
     p5.rect(0, 0, 100, 100);
-    console.log("draw");
+    // console.log("draw");
   }, []);
 
 
   return (
     <>
-        <P5Sketch className={`the-sketch`} { ...{ setup, draw } } width={`${WIDTH}`} height={`${HEIGHT}`} />
+        <P5Sketch className={`the-sketch`} { ...{ preload, setup, draw } } width={`${WIDTH}`} height={`${HEIGHT}`} />
     </>
   )
 };
