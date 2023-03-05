@@ -1,4 +1,5 @@
-import React, { MutableRefObject, useEffect, useRef } from 'react';
+/* eslint @typescript-eslint/no-unsafe-argument: "off" */
+import React, { type MutableRefObject, useEffect, useRef } from 'react';
 import p5 from 'p5';
 
 const p5Events = [
@@ -33,7 +34,7 @@ type P5SketchProps = {
   height: `${number}`,
   id?: string,
   className?: string,
-  style?: Object,
+  style?: object,
 } & Partial<Record<EventNameType, EventHandler>>;
 
 type InternalEventName = `_internal_${EventNameType}`;
@@ -65,7 +66,7 @@ export default function P5Sketch(props: P5SketchProps) {
               if (event == "setup") {
                 args.push(canvasParentRef.current);
               }
-              p[`_internal_${event}`]!(p, ...args);
+              p[`_internal_${event}`]?.(p, ...args);
             };
           }
         });
@@ -73,9 +74,9 @@ export default function P5Sketch(props: P5SketchProps) {
     } else {
       // console.log('update sketch');
       p5Events.forEach((event) => {
-        if (events[event] && events[event] !== sketchRef.current![`_internal_${event}`]) {
+        if (events[event] && events[event] !== sketchRef.current?.[`_internal_${event}`]) {
           // console.log(event,"changed");
-          sketchRef.current![`_internal_${event}`] = events[event];
+          if (sketchRef.current) sketchRef.current[`_internal_${event}`] = events[event];
         }
       });
     }
@@ -97,4 +98,4 @@ export default function P5Sketch(props: P5SketchProps) {
         style
       }}
     />;
-};
+}

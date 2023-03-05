@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-unsafe-assignment: "off" */
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import Image from "next/image";
@@ -87,7 +88,7 @@ interface IconProps {
   size?: number;
   className?: string;
   [key: string]: any;
-};
+}
 function Icon({icon, alt, size=20, className, ...rest}: IconProps) {
   return (
     <div className={className} { ...rest }>

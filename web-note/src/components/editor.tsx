@@ -1,6 +1,6 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback } from "react";
 
-import p5 from "p5";
+import type p5 from "p5";
 import P5Sketch from "~/components/p5-sketch";
 
 const WIDTH = 500;
@@ -17,7 +17,7 @@ type ToolName = typeof TOOLS[number];
 interface EditorProps {
   canvasRendererRef: React.MutableRefObject<p5.Renderer | undefined>;
   activeTool: ToolName;
-};
+}
 
 const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef }: EditorProps) => {
 
@@ -32,7 +32,7 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef }: EditorPro
     // console.log(canvasElt.isConnected);
     p5.noStroke();
     p5.loop();
-  }, []);
+  }, [canvasRendererRef]);
 
   const draw = useCallback((p5: p5) => {
     p5.background(0);
