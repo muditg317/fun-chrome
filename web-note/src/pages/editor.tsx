@@ -1,4 +1,4 @@
-/* eslint @typescript-eslint/no-unsafe-assignment: "off" */
+/* eslint @typescript-eslint/no-unsafe-assignment: "warn" */
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import Image from "next/image";

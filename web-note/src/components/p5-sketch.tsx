@@ -1,4 +1,4 @@
-/* eslint @typescript-eslint/no-unsafe-argument: "off" */
+/* eslint @typescript-eslint/no-unsafe-argument: "warn" */
 import React, { type MutableRefObject, useEffect, useRef } from 'react';
 import p5 from 'p5';
 
