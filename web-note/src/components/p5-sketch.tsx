@@ -56,16 +56,6 @@ type InternalP5EventRecord = addPrefixToObject<HandlerRecord, '_internal_'>;
 
 type P5SketchRefType = p5 & Partial<InternalP5EventRecord>;
 
-// function setEvent<T extends keyof HandlerRecord>(sketch: P5SketchRefType, event: T, handler: HandlerRecord[T]) {
-//   sketch[`_internal_${event}`] = handler;
-//   sketch[event] = (...args: Parameters<HandlerRecord[T]>) => {
-//     if (event == "_internal_setup") {
-//       if (sketch.canvas.parentElement) (args as unknown as Parameters<InternalP5EventRecord['_internal_setup']>)[1] = sketch.canvas.parentElement;
-//     }
-//     (handler as unknown as any)?.(sketch, ...(args as any));
-//   };
-// }
-
 export default function P5Sketch(props: P5SketchProps) {
   const {
     width,

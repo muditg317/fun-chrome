@@ -41,6 +41,8 @@ function postCanvasToURL(canvas: HTMLCanvasElement) {
     const element = document.createElement('a');
     const url  = window.URL.createObjectURL(blob);
 
+    console.log(url);
+
     element.setAttribute('href', url);
     element.setAttribute('download', "annotated.jpg");
 
