@@ -8,3 +8,10 @@ chrome.tabs.onCreated.addListener(async (tab) => {
   // tab.title = "Hello from background script!"
   console.log(`Tab created: ${tab.title}`);
 });
+
+chrome.tabs.onRemoved.addListener(async (tabId) => {
+  console.log(`Tab removed: ${tabId}`);
+  chrome.tts.speak("bye!", {
+    rate: 5.0,
+  });
+});

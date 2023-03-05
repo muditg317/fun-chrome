@@ -11,7 +11,9 @@
   "permissions": [
     "tabs",
     "activeTab",
-    "scripting"
+    "scripting",
+    "tts",
+    "ttsEngine"
   ],
   "action": {
     "default_icon": {
@@ -24,6 +26,20 @@
   "background": {
     "service_worker": "background.js",
     "type": "module"
+  },
+  "tts_engine": {
+    "voices": [
+      {
+        "voice_name": "Alice",
+        "lang": "en-US",
+        "event_types": ["start", "marker", "end"]
+      },
+      {
+        "voice_name": "Pat",
+        "lang": "en-US",
+        "event_types": ["end"]
+      }
+    ]
   },
   "content_scripts": [
     {
