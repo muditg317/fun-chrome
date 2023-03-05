@@ -7,7 +7,6 @@ const config = {
   entry: {
     popup: path.join(__dirname, "src/popup.tsx"),
     content: path.join(__dirname, "src/scripts/content-script.ts"),
-    "content-newtab": path.join(__dirname, "src/scripts/content-newtab.ts"),
     background: path.join(__dirname, "src/scripts/service-worker.ts"),
     "fun-chrome-effects": path.join(__dirname, "src/assets/styles/fun-chrome-effects.css"),
   },
