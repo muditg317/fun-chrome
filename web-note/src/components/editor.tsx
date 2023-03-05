@@ -45,7 +45,7 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef }: EditorPro
     backgroundImage = p5.loadImage(dummyImg.src);
   }, [])
 
-  const setup = useCallback((p5: p5) => {
+  const setup = useCallback((p5: p5, parent: HTMLDivElement) => {
     canvasRendererRef.current = p5.createCanvas(WIDTH,HEIGHT);
     // console.log(canvasRendererRef.current.elt);
     // console.log(parent);
