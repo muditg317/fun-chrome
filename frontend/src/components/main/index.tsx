@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import reactLogo from 'assets/images/react.svg'
 import './main.css'
+import Editor from 'components/editor'
 
 function Main() {
   const [count, setCount] = useState(0)
@@ -27,6 +28,7 @@ function Main() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+      <Editor />
     </div>
   )
 }
