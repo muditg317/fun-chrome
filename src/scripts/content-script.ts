@@ -22,3 +22,10 @@ window.addEventListener("dblclick", (event) => {
     div.remove();
   }, 1000);
 });
+
+window.addEventListener("click", event => {
+  document.body.style.animation = "wobble 1s ease-out forwards";
+  setTimeout(() => {
+    document.body.style.animation = "unset";
+  }, 1000);
+});

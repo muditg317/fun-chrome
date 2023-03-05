@@ -9,7 +9,9 @@
     "128": "icon128.png"
   },
   "permissions": [
-    "tabs"
+    "tabs",
+    "activeTab",
+    "scripting"
   ],
   "action": {
     "default_icon": {
