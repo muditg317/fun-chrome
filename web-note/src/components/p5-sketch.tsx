@@ -1,4 +1,4 @@
-/* eslint @typescript-eslint/no-unsafe-argument: "warn" */
+/* eslint @typescript-eslint/no-unsafe-argument: "warn", @typescript-eslint/no-unsafe-call: "warn" */
 import React, { type MutableRefObject, useEffect, useRef } from 'react';
 import p5 from 'p5';
 
@@ -27,7 +27,17 @@ const p5Events = [
 
 type EventNameType = typeof p5Events[number];
 
-type EventHandler = (p5: p5, ...args: any[]) => void;
+type CustomEventHandlers = {
+  setup: (parent: HTMLDivElement) => void,
+}
+
+type P5EventRecord = Pick<p5, Exclude<EventNameType, keyof CustomEventHandlers>> & CustomEventHandlers;
+
+type addP5Params<T> = T extends (...args: infer P) => void ? (p: p5, ...args: P) => void : never;
+type WithP5Params<T> = {
+  [K in keyof T]: addP5Params<T[K]>
+}
+
 
 type P5SketchProps = {
   width: `${number}`,
@@ -35,11 +45,15 @@ type P5SketchProps = {
   id?: string,
   className?: string,
   style?: object,
-} & Partial<Record<EventNameType, EventHandler>>;
+} & Partial<WithP5Params<P5EventRecord>>;
 
-type InternalEventName = `_internal_${EventNameType}`;
+type addPrefixToObject<T, P extends string> = {
+  [K in keyof T as K extends string ? `${P}${K}` : never]: T[K]
+}
 
-type P5SketchRefType = p5 & Partial<Record<InternalEventName, EventHandler>>;
+type InternalP5EventRecord = addPrefixToObject<WithP5Params<P5EventRecord>, '_internal_'>;
+
+type P5SketchRefType = p5 & Partial<InternalP5EventRecord>;
 
 export default function P5Sketch(props: P5SketchProps) {
   const {
@@ -62,11 +76,11 @@ export default function P5Sketch(props: P5SketchProps) {
         p5Events.forEach((event) => {
           if (events[event]) {
             p[`_internal_${event}`] = events[event];
-            p[event] = (...args: any[]) => {
+            p[event] = (...args: Parameters<P5EventRecord[typeof event]>) => {
               if (event == "setup") {
-                args.push(canvasParentRef.current);
+                if (canvasParentRef.current) (args as unknown as Parameters<InternalP5EventRecord['_internal_setup']>)[1] = canvasParentRef.current;
               }
-              p[`_internal_${event}`]?.(p, ...args);
+              (p[`_internal_${event}`] as unknown as any)?.(p, ...(args as any));
             };
           }
         });
