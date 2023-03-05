@@ -29,12 +29,12 @@ type EventNameType = typeof p5Events[number];
 type EventHandler = (p5: p5, ...args: any[]) => void;
 
 type SketchProps = {
-  width: number,
-  height: number,
+  width: `${number}`,
+  height: `${number}`,
   id?: string,
   className?: string,
   style?: Object,
-} & Record<EventNameType, EventHandler>;
+} & Partial<Record<EventNameType, EventHandler>>;
 
 type InternalEventName = `_internal_${EventNameType}`;
 
