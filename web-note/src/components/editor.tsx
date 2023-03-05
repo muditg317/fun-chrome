@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+/* eslint @typescript-eslint/restrict-template-expressions: "warn" */
+import React, { useCallback, useRef } from "react";
 
 import type p5 from "p5";
 import P5Sketch from "~/components/p5-sketch";
@@ -26,14 +27,6 @@ interface EditorProps {
 const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool }: EditorProps) => {
   const backgroundImageRef = useRef<p5.Image>();
 
-  const [mouseIsActive, setMouseIsActive] = useState(false);
-
-  //let startX: number, startY: number, endX: number, endY: number;
-
-  const penIsOn = useMemo(() => activeTool === "pen", [activeTool]);
-  const eraserIsOn = useMemo(() => activeTool === "eraser", [activeTool]);
-  const highligherIsOn = useMemo(() => activeTool === "highlighter", [activeTool]);
-
   const preload = useCallback((p5: p5) => {
     backgroundImageRef.current = p5.loadImage(dummyImg.src);
   }, [])
@@ -49,30 +42,7 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool 
     // p5.blendMode(p5.LIGHTEST);
   }, [backgroundImageRef, canvasRendererRef]);
 
-  // const draw = useCallback((p5: p5) => {
-  //   // console.log("draw");
-  //   // p5.stroke(0);
-  //   // p5.strokeWeight(5);
-  //   // if (mouseIsActive && highligherIsOn) {
-  //   //   p5.stroke(255, 255, 0, 32);
-  //   //   p5.strokeWeight(30);
-  //   //   p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
-  //   //   console.log("highlighter");
-  //   // } else if (mouseIsActive && eraserIsOn) {
-  //   //   console.log("eraser");
-  //   //   backgroundImageRef.current && p5.image(backgroundImageRef.current, p5.mouseX - 10, p5.mouseY - 10, 20, 20, (p5.mouseX - 10) / WIDTH * backgroundImageRef.current.width , (p5.mouseY - 10) / HEIGHT * backgroundImageRef.current.height, 20 / WIDTH * backgroundImageRef.current.width, 20 / HEIGHT * backgroundImageRef.current.height);
-  //   // } else if (mouseIsActive && penIsOn) {
-  //   //   console.log("pen");
-  //   //   p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
-  //   // }
-  // }, [mouseIsActive, penIsOn, eraserIsOn, highligherIsOn]);
-
-  // const mousePressed = useP5Event(useCallback(() => {
-  //   setMouseIsActive(true);
-  // }, [setMouseIsActive]), INTERACTION_BOUNDS);
-
   const mouseDragged = useP5Event(useCallback((p5: p5) => {
-    setMouseIsActive(true);
     //console.log(activeTool, p5);
     switch (activeTool) {
       case "pen":
@@ -97,13 +67,9 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool 
         console.error(`Unknown tool: ${activeTool}`);
         break;
     }
-  }, [activeTool, setMouseIsActive]), INTERACTION_BOUNDS);
+  }, [activeTool]), INTERACTION_BOUNDS);
 
   const touchMoved = mouseDragged;
-
-  // const mouseReleased = useCallback(() => {
-  //     setMouseIsActive(false);
-  // }, [setMouseIsActive]);
 
   return (
     <P5Sketch className={`the-sketch`} { ...{ preload, setup, mouseDragged, touchMoved } } width={`${WIDTH}`} height={`${HEIGHT}`} />

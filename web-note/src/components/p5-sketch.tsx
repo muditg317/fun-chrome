@@ -33,7 +33,7 @@ type CustomEventHandlers = {
 
 type P5EventRecord = Pick<p5, Exclude<EventNameType, keyof CustomEventHandlers>> & CustomEventHandlers;
 
-type addP5Params<T> = T extends (...args: infer P) => void ? (p: p5, ...args: P) => void : never;
+type addP5Params<T> = T extends (...args: infer P) => void ? (p: p5, ...args: P) => void : unknown;
 type WithP5Params<T> = {
   [K in keyof T]: addP5Params<T[K]>
 }
@@ -48,7 +48,7 @@ type P5SketchProps = {
 } & Partial<WithP5Params<P5EventRecord>>;
 
 type addPrefixToObject<T, P extends string> = {
-  [K in keyof T as K extends string ? `${P}${K}` : never]: T[K]
+  [K in keyof T as K extends string ? `${P}${K}` : string]: T[K]
 }
 
 type InternalP5EventRecord = addPrefixToObject<WithP5Params<P5EventRecord>, '_internal_'>;

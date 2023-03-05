@@ -37,7 +37,7 @@ type Tool = typeof tools[number];
 
 function postCanvasToURL(snap: p5.Renderer) {
   // Convert canvas image to Base64
-  const blob = (snap.elt as HTMLCanvasElement).toBlob((blob) => {
+  (snap.elt as HTMLCanvasElement).toBlob((blob) => {
     if (!blob) return;
     // let file = new File([blob], "fileName.jpg", { type: "image/jpeg" })
     
