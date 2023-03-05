@@ -49,6 +49,7 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool 
   }, [backgroundImageRef, canvasRendererRef]);
 
   const draw = useCallback((p5: p5) => {
+    // console.log("draw");
     p5.stroke(0);
     p5.strokeWeight(5);
     if (mouseIsActive && highligherIsOn) {

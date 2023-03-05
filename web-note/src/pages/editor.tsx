@@ -105,7 +105,7 @@ const Editor: React.FC = () => {
               className={`px-4 py-4 hover:bg-[#646c75] first:rounded-t-md last:rounded-b-md ${activeTool.name === tool.name ? "bg-[#646c75]" : ""}`}
               onClick={() => {
                 setActiveTool(tool);
-                console.log(tool);
+                // console.log(tool);
               }}
             />
           ))}
