@@ -37,12 +37,12 @@ type Tool = typeof tools[number];
 
 function postCanvasToURL(snap: p5.Renderer) {
   // Convert canvas image to Base64
-  var blob = (snap.elt as HTMLCanvasElement).toBlob((blob) => {
+  const blob = (snap.elt as HTMLCanvasElement).toBlob((blob) => {
     if (!blob) return;
-    let file = new File([blob], "fileName.jpg", { type: "image/jpeg" })
+    // let file = new File([blob], "fileName.jpg", { type: "image/jpeg" })
     
-    var element = document.createElement('a');
-    var url  = window.URL.createObjectURL(blob);
+    const element = document.createElement('a');
+    const url  = window.URL.createObjectURL(blob);
     element.setAttribute('href', url);
     element.setAttribute('download', "annotated.jpg");
 
