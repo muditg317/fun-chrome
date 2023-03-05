@@ -45,31 +45,31 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool 
     canvasRendererRef.current.parent(parent);
     p5.noStroke();
     backgroundImageRef.current && p5.background(backgroundImageRef.current);
-    p5.noLoop();
-    p5.blendMode(p5.LIGHTEST);
+    p5.loop();
+    // p5.blendMode(p5.LIGHTEST);
   }, [backgroundImageRef, canvasRendererRef]);
 
-  const draw = useCallback((p5: p5) => {
-    // console.log("draw");
-    // p5.stroke(0);
-    // p5.strokeWeight(5);
-    // if (mouseIsActive && highligherIsOn) {
-    //   p5.stroke(255, 255, 0, 32);
-    //   p5.strokeWeight(30);
-    //   p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
-    //   console.log("highlighter");
-    // } else if (mouseIsActive && eraserIsOn) {
-    //   console.log("eraser");
-    //   backgroundImageRef.current && p5.image(backgroundImageRef.current, p5.mouseX - 10, p5.mouseY - 10, 20, 20, (p5.mouseX - 10) / WIDTH * backgroundImageRef.current.width , (p5.mouseY - 10) / HEIGHT * backgroundImageRef.current.height, 20 / WIDTH * backgroundImageRef.current.width, 20 / HEIGHT * backgroundImageRef.current.height);
-    // } else if (mouseIsActive && penIsOn) {
-    //   console.log("pen");
-    //   p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
-    // }
-  }, [mouseIsActive, penIsOn, eraserIsOn, highligherIsOn]);
+  // const draw = useCallback((p5: p5) => {
+  //   // console.log("draw");
+  //   // p5.stroke(0);
+  //   // p5.strokeWeight(5);
+  //   // if (mouseIsActive && highligherIsOn) {
+  //   //   p5.stroke(255, 255, 0, 32);
+  //   //   p5.strokeWeight(30);
+  //   //   p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
+  //   //   console.log("highlighter");
+  //   // } else if (mouseIsActive && eraserIsOn) {
+  //   //   console.log("eraser");
+  //   //   backgroundImageRef.current && p5.image(backgroundImageRef.current, p5.mouseX - 10, p5.mouseY - 10, 20, 20, (p5.mouseX - 10) / WIDTH * backgroundImageRef.current.width , (p5.mouseY - 10) / HEIGHT * backgroundImageRef.current.height, 20 / WIDTH * backgroundImageRef.current.width, 20 / HEIGHT * backgroundImageRef.current.height);
+  //   // } else if (mouseIsActive && penIsOn) {
+  //   //   console.log("pen");
+  //   //   p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
+  //   // }
+  // }, [mouseIsActive, penIsOn, eraserIsOn, highligherIsOn]);
 
-  const mousePressed = useP5Event(useCallback(() => {
-    setMouseIsActive(true);
-  }, [setMouseIsActive]), INTERACTION_BOUNDS);
+  // const mousePressed = useP5Event(useCallback(() => {
+  //   setMouseIsActive(true);
+  // }, [setMouseIsActive]), INTERACTION_BOUNDS);
 
   const mouseDragged = useP5Event(useCallback((p5: p5) => {
     setMouseIsActive(true);
@@ -77,19 +77,21 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool 
     switch (activeTool) {
       case "pen":
         p5.stroke(0);
-        p5.strokeWeight(5);
+        p5.strokeWeight(6);
+        // p5.stroke(255, 0, 0, 255);
+        // p5.strokeWeight(5);
         p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
-        console.log("pen");
+        // console.log(`draw pen line: ${p5.mouseX}, ${p5.mouseY}, ${p5.pmouseX}, ${p5.pmouseY}`);
         break;
       case "highlighter":
         p5.stroke(255, 255, 0, 32);
         p5.strokeWeight(30);
         p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
-        console.log("highlighter");
+        // console.log("highlighter");
         break;
       case "eraser":
         backgroundImageRef.current && p5.image(backgroundImageRef.current, p5.mouseX - 10, p5.mouseY - 10, 20, 20, (p5.mouseX - 10) / WIDTH * backgroundImageRef.current.width , (p5.mouseY - 10) / HEIGHT * backgroundImageRef.current.height, 20 / WIDTH * backgroundImageRef.current.width, 20 / HEIGHT * backgroundImageRef.current.height);
-        console.log("eraser");
+        // console.log("eraser");
         break;
       default:
         console.error(`Unknown tool: ${activeTool}`);
@@ -97,12 +99,14 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool 
     }
   }, [activeTool, setMouseIsActive]), INTERACTION_BOUNDS);
 
-  const mouseReleased = useCallback(() => {
-      setMouseIsActive(false);
-  }, [setMouseIsActive]);
+  const touchMoved = mouseDragged;
+
+  // const mouseReleased = useCallback(() => {
+  //     setMouseIsActive(false);
+  // }, [setMouseIsActive]);
 
   return (
-    <P5Sketch className={`the-sketch`} { ...{ preload, setup, draw, mousePressed, mouseDragged, mouseReleased } } width={`${WIDTH}`} height={`${HEIGHT}`} />
+    <P5Sketch className={`the-sketch`} { ...{ preload, setup, mouseDragged, touchMoved } } width={`${WIDTH}`} height={`${HEIGHT}`} />
   );
 };
 
