@@ -1,8 +1,9 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 
 import type p5 from "p5";
 import P5Sketch from "~/components/p5-sketch";
 import dummyImg from "~/assets/dummyImg.png";
+import useP5Event from "~/hooks/useP5Event";
 
 const WIDTH = 500;
 const HEIGHT = 500;
@@ -22,27 +23,19 @@ interface EditorProps {
   activeTool: ToolName;
 }
 
-const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef }: EditorProps) => {
-  let backgroundImage: p5.Image;
-  let mouseIsActive = false;
+const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool }: EditorProps) => {
+  const backgroundImageRef = useRef<p5.Image>();
+
+  const [mouseIsActive, setMouseIsActive] = useState(false);
 
   //let startX: number, startY: number, endX: number, endY: number;
 
-  let eraserIOn = false;
-  let highligherIsOn = false;
-
-
-  const eraserOn = (() => {
-    eraserIOn = !eraserIOn;
-  })
-
-  const highligherOn = (() => {
-    highligherIsOn = !highligherIsOn;
-    console.log(highligherIsOn);
-  })
+  const penIsOn = useMemo(() => activeTool === "pen", [activeTool]);
+  const eraserIsOn = useMemo(() => activeTool === "eraser", [activeTool]);
+  const highligherIsOn = useMemo(() => activeTool === "highlighter", [activeTool]);
 
   const preload = useCallback((p5: p5) => {
-    backgroundImage = p5.loadImage(dummyImg.src);
+    backgroundImageRef.current = p5.loadImage(dummyImg.src);
   }, [])
 
   const setup = useCallback((p5: p5, parent: HTMLDivElement) => {
@@ -51,48 +44,38 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef }: EditorPro
     // console.log(parent);
     canvasRendererRef.current.parent(parent);
     p5.noStroke();
-    p5.background(backgroundImage);
+    backgroundImageRef.current && p5.background(backgroundImageRef.current);
     p5.loop();
-  }, []);
+  }, [backgroundImageRef, canvasRendererRef]);
 
   const draw = useCallback((p5: p5) => {
     p5.stroke(0);
     p5.strokeWeight(5);
     if (mouseIsActive && highligherIsOn) {
       p5.stroke(255, 255, 0, 32);
-      p5.strokeWeight(50);
+      p5.strokeWeight(30);
       p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
       console.log("highlighter");
-    } else if (mouseIsActive && eraserIOn) {
+    } else if (mouseIsActive && eraserIsOn) {
       console.log("eraser");
-      p5.image(backgroundImage, p5.mouseX - 10, p5.mouseY - 10, 20, 20, (p5.mouseX - 10) / WIDTH * backgroundImage.width , (p5.mouseY - 10) / HEIGHT * backgroundImage.height, 20 / WIDTH * backgroundImage.width, 20 / HEIGHT * backgroundImage.height);
-    } else if (mouseIsActive) {
+      backgroundImageRef.current && p5.image(backgroundImageRef.current, p5.mouseX - 10, p5.mouseY - 10, 20, 20, (p5.mouseX - 10) / WIDTH * backgroundImageRef.current.width , (p5.mouseY - 10) / HEIGHT * backgroundImageRef.current.height, 20 / WIDTH * backgroundImageRef.current.width, 20 / HEIGHT * backgroundImageRef.current.height);
+    } else if (mouseIsActive && penIsOn) {
       console.log("pen");
       p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
     }
+  }, [mouseIsActive, penIsOn, eraserIsOn, highligherIsOn]);
 
-  }, []);
+  const mousePressed = useP5Event(useCallback(() => {
+    setMouseIsActive(true);
+  }, [setMouseIsActive]), INTERACTION_BOUNDS);
 
-  const mousePressed = (() => {
-    mouseIsActive = true;
-  })
 
-  const mouseDragged = ((p5: p5) => {
-    if (p5.mouseX < INTERACTION_BOUNDS[0] || p5.mouseX > INTERACTION_BOUNDS[1] || p5.mouseY < INTERACTION_BOUNDS[2] || p5.mouseY > INTERACTION_BOUNDS[3]) {
-      mouseIsActive = false;
-    }
-  })
-
-  const mouseReleased = (() => {
-    mouseIsActive = false;
-  })
+  const mouseReleased = useCallback((p5: p5) => {
+      setMouseIsActive(false);
+  }, [setMouseIsActive]);
 
   return (
-    <div>
-      <button onClick={eraserOn}>Eraser</button>
-      <button onClick={highligherOn}>Highlighter</button>
-      <P5Sketch className={`the-sketch`} { ...{ preload, setup, draw, mousePressed, mouseDragged, mouseReleased } } width={`${WIDTH}`} height={`${HEIGHT}`} />
-    </div>
+    <P5Sketch className={`the-sketch`} { ...{ preload, setup, draw, mousePressed, mouseReleased } } width={`${WIDTH}`} height={`${HEIGHT}`} />
   );
 };
 
