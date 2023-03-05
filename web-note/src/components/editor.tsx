@@ -73,20 +73,24 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool 
 
   const mouseDragged = useP5Event(useCallback((p5: p5) => {
     setMouseIsActive(true);
-    console.log(activeTool, p5);
+    //console.log(activeTool, p5);
     switch (activeTool) {
       case "pen":
         p5.stroke(0);
         p5.strokeWeight(5);
         p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
+        console.log("pen");
         break;
       case "highlighter":
         p5.stroke(255, 255, 0, 32);
         p5.strokeWeight(30);
         p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
+        console.log("highlighter");
         break;
       case "eraser":
         backgroundImageRef.current && p5.image(backgroundImageRef.current, p5.mouseX - 10, p5.mouseY - 10, 20, 20, (p5.mouseX - 10) / WIDTH * backgroundImageRef.current.width , (p5.mouseY - 10) / HEIGHT * backgroundImageRef.current.height, 20 / WIDTH * backgroundImageRef.current.width, 20 / HEIGHT * backgroundImageRef.current.height);
+        console.log("eraser");
+        break;
       default:
         console.error(`Unknown tool: ${activeTool}`);
         break;
