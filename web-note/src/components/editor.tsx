@@ -23,17 +23,22 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef }: EditorPro
 
   // const canvas = useRef<p5.Renderer>();
 
-  const setup = useCallback((p5: p5) => {
+  const setup = useCallback((p5: p5, parent: HTMLDivElement) => {
+    console.log("setup");
     canvasRendererRef.current = p5.createCanvas(WIDTH,HEIGHT);
     console.log(canvasRendererRef.current);
+    canvasRendererRef.current.parent(parent);
+    // const canvasElt = canvasRendererRef.current.elt as HTMLCanvasElement;
+    // console.log(canvasElt.isConnected);
     p5.noStroke();
+    p5.loop();
   }, []);
 
   const draw = useCallback((p5: p5) => {
     p5.background(0);
     p5.fill(255);
     p5.rect(0, 0, 100, 100);
-
+    console.log("draw");
   }, []);
 
 

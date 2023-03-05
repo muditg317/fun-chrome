@@ -8,14 +8,15 @@ import DownloadIcon from "~/assets/downloadicon.svg";
 import PenIcon from "~/assets/penicon.svg";
 import HighlighterIcon from "~/assets/markericon.svg";
 import EraserIcon from "~/assets/erasoricon.svg";
+import Link from "next/link";
 
 // import EditorComponent from "~/components/editor";
 const EditorComponent = dynamic(() => import("~/components/editor"), { ssr: false });
 
-interface Tool {
-  icon: any,
-  name: string,
-};
+// interface Tool {
+//   icon: any,
+//   name: string,
+// };
 const tools = [
   {
     icon: PenIcon,
@@ -31,6 +32,8 @@ const tools = [
   },
 ] as const;
 
+type Tool = typeof tools[number];
+
 const Editor: React.FC = () => {
   const canvasRef = useRef<p5.Renderer>();
 
@@ -44,10 +47,11 @@ const Editor: React.FC = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <header className="flex items-center justify-between w-full px-4 py-4 bg-[#404348]">
-        <div className="flex items-center gap-4">
+        <Link className="flex items-center gap-4"
+          href="/">
           {/* <Icon icon={EraserIcon} alt="Logo"/> */}
           <h1 className="text-2xl font-bold text-white">Web Note</h1>
-        </div>
+        </Link>
         <div className="flex items-center gap-4">
           <button className="flex items-center gap-2 px-4 py-2 text-white bg-[#727780] rounded-md hover:bg-[#9498a0]">
             <span>Download</span>

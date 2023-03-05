@@ -56,13 +56,16 @@ export default function P5Sketch(props: P5SketchProps) {
   useEffect(() => {
     if (!sketchRef.current) {
       // console.log('create new sketch');
-      sketchRef.current = new p5(p => {
+      sketchRef.current = new p5((p: P5SketchRefType) => {
         // console.log(events);
         p5Events.forEach((event) => {
           if (events[event]) {
             p[`_internal_${event}`] = events[event];
             p[event] = (...args: any[]) => {
-              p[`_internal_${event}`](p, ...args);
+              if (event == "setup") {
+                args.push(canvasParentRef.current);
+              }
+              p[`_internal_${event}`]!(p, ...args);
             };
           }
         });
