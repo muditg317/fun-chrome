@@ -6,7 +6,7 @@ import P5Sketch, {type P5SketchRefType} from "~/components/p5-sketch";
 import dummyImg from "~/assets/dummyImg.png";
 import useP5Event from "~/hooks/useP5Event";
 
-// const WIDTH = 500;
+const MAX_WIDTH = 800;
 // const HEIGHT = 500;
 const INTERACTION_MARGIN = 5;
 // const INTERACTION_BOUNDS = [-INTERACTION_MARGIN, WIDTH+INTERACTION_MARGIN, -INTERACTION_MARGIN, HEIGHT+INTERACTION_MARGIN] as const;
@@ -52,8 +52,11 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool,
 
   const setup = useCallback((p5: p5, parent: HTMLDivElement) => {
     const background = backgroundImageRef.current!;
-    
-    canvasRendererRef.current = p5.createCanvas(background.width,background.height);
+    let scale = 1;
+    if (background.width > MAX_WIDTH) {
+      scale = MAX_WIDTH / background.width;
+    }
+    canvasRendererRef.current = p5.createCanvas(background.width*scale,background.height*scale);
     // console.log(canvasRendererRef.current.elt);
     // console.log(parent);
     canvasRendererRef.current.parent(parent);
