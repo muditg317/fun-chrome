@@ -1,5 +1,3 @@
-console.log("hello from web note");
-
 chrome.runtime.onMessage
     .addListener(function(message,sender,sendResponse) {
         addImagesToContainer(message);
@@ -10,4 +8,3 @@ function addImagesToContainer(imgData:any) {
     localStorage.setItem("imageFromExtension", imgData);
     console.log("save image");
 }
-
