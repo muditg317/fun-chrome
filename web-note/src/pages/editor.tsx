@@ -116,7 +116,7 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
     void delay(1000).then(() => {
       const currValue = localStorage.getItem("imageFromExtension");
       if (currValue) {
-        console.log("found value without change handler", currValue);
+        console.log("found value without change handler");
         loadStoredData(currValue);
       } else {
         console.log("register storage listener");
@@ -241,7 +241,7 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
           ))}
         </div>
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-          {defaultImageData &&
+          {(defaultImageData || title==="Untitled") &&
             <EditorComponent canvasRendererRef={canvasRef} activeTool={activeTool.name} baseImage={defaultImageData} />
           }
         </div>

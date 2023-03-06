@@ -2,7 +2,8 @@ import * as React from "react";
 import logo from "../../assets/images/logo.svg";
 import "./popup.css";
 
-const isProd = process.env.NODE_ENV === "production" && false;
+// const isProd = process.env.NODE_ENV === "production" && true;
+const isProd = false;
 const HOST_NAME = isProd ? "https://webnote.mudit.tech" : "http://localhost:3000";
 
 const popupApp = () => {

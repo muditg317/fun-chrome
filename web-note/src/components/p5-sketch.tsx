@@ -40,14 +40,6 @@ type WithP5Params<T> = {
 
 type HandlerRecord = WithP5Params<P5EventRecord>;
 
-type P5SketchProps = {
-  width: `${number}`,
-  height: `${number}`,
-  id?: string,
-  className?: string,
-  style?: object,
-  p5Ref: MutableRefObject<p5 | undefined>,
-} & Partial<HandlerRecord>;
 
 type addPrefixToObject<T, P extends string> = {
   [K in keyof T as K extends string ? `${P}${K}` : string]: T[K]
@@ -57,10 +49,16 @@ type InternalP5EventRecord = addPrefixToObject<HandlerRecord, '_internal_'>;
 
 export type P5SketchRefType = p5 & Partial<InternalP5EventRecord>;
 
+
+type P5SketchProps = {
+  id?: string,
+  className?: string,
+  style?: object,
+  p5Ref: MutableRefObject<P5SketchRefType | undefined>,
+} & Partial<HandlerRecord>;
+
 export default function P5Sketch(props: P5SketchProps) {
   const {
-    width,
-    height,
     id,
     className = "react-p5",
     style,
@@ -69,7 +67,7 @@ export default function P5Sketch(props: P5SketchProps) {
   } = props;
 
   const canvasParentRef = useRef<HTMLDivElement>();
-  const sketchRef = useRef<P5SketchRefType>();
+  const sketchRef = p5Ref;//useRef<P5SketchRefType>();
   // const handlerCache = useRef<Partial<HandlerRecord>>({});
 
   useEffect(() => {
@@ -109,8 +107,8 @@ export default function P5Sketch(props: P5SketchProps) {
   return <div
       ref={canvasParentRef as MutableRefObject<HTMLDivElement>}
       { ...{
-        width,
-        height,
+        // width,
+        // height,
         id,
         className,
         style
