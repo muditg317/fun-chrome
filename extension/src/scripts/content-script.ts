@@ -3,6 +3,8 @@ console.log("Hello from content script! - 5");
 
 
 
+
+
 window.addEventListener("dblclick", (event) => {
   console.log("Double click event fired!");
   const div = document.createElement("div");
@@ -20,12 +22,5 @@ window.addEventListener("dblclick", (event) => {
 
   setTimeout(() => {
     div.remove();
-  }, 1000);
-});
-
-window.addEventListener("click", event => {
-  document.body.style.animation = "wobble 1s ease-out forwards";
-  setTimeout(() => {
-    document.body.style.animation = "unset";
   }, 1000);
 });

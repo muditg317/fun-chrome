@@ -71,26 +71,39 @@ function saveCanvasToImg(canvas: HTMLCanvasElement) {
   }, 'image/jpeg');
 }
 
-type Nullable<T> = {
-  [P in keyof T]: T[P] | null;
-}
-type EditorProps = Nullable<{
+type EditorProps = {
+  host: string | null,
   title: string,
-  host: string,
-}>
+  img: string | null
+}
 
 
 export const getServerSideProps: GetServerSideProps<EditorProps> =
   async context => ({ props: {
     host: !context.req.headers.host ? null : `${context.req.headers.referer ? (new URL(context.req.headers.referer)).protocol : "http://"}${context.req.headers.host}`,
-    title: (context.query.title as string) || null,
+    title: (context.query.title as string) || "Untitled",
+    img: (context.query.img as string) || null,
   } });
 
-const Editor: NextPage<EditorProps> = ({title: _title, host: _host}: EditorProps) => {
+const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) => {
   const canvasRef = useRef<p5.Renderer>();
 
-  const title = _title || "Untitled";
   const host = _host || "http://fallback.com";
+
+  const [defaultImageData, setDefaultImageData] = useState<string>("");
+
+  console.log("loggin", img);
+  useEffect(() => {
+    if (!img) return;
+    if (img !== "loadFromLocalStorage") return;
+    if (defaultImageData) return;
+    const data = localStorage.getItem("imageFromExtension");
+    console.log("test", data);
+    if (data) {
+      setDefaultImageData(data);
+      //localStorage.removeItem("imageFromExtension");
+    }
+  }, [img, defaultImageData]);
 
   const [activeTool, setActiveTool] = useState<Tool>(tools[0]);
   const [showExportOption, setShowExportOption] = useState(false);
@@ -204,7 +217,7 @@ const Editor: NextPage<EditorProps> = ({title: _title, host: _host}: EditorProps
           ))}
         </div>
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-          <EditorComponent canvasRendererRef={canvasRef} activeTool={activeTool.name} />
+          <EditorComponent canvasRendererRef={canvasRef} activeTool={activeTool.name} baseImage={defaultImageData} />
         </div>
       </main>
     </>

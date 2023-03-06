@@ -22,14 +22,22 @@ type ToolName = typeof TOOLS[number];
 interface EditorProps {
   canvasRendererRef: React.MutableRefObject<p5.Renderer | undefined>;
   activeTool: ToolName;
+  baseImage: string;
 }
 
-const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool }: EditorProps) => {
+const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool, baseImage }: EditorProps) => {
   const backgroundImageRef = useRef<p5.Image>();
 
   const preload = useCallback((p5: p5) => {
-    backgroundImageRef.current = p5.loadImage(dummyImg.src);
-  }, [])
+    console.log("running preload");
+    if (baseImage) {
+      console.log("using base image");
+      backgroundImageRef.current = p5.loadImage(baseImage);
+      console.log(backgroundImageRef.current);
+    } else {
+      backgroundImageRef.current = p5.loadImage(dummyImg.src);
+    }
+  }, [baseImage])
 
   const setup = useCallback((p5: p5, parent: HTMLDivElement) => {
     canvasRendererRef.current = p5.createCanvas(WIDTH,HEIGHT);
