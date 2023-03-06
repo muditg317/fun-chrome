@@ -78,8 +78,8 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool,
         // console.log(`draw pen line: ${p5.mouseX}, ${p5.mouseY}, ${p5.pmouseX}, ${p5.pmouseY}`);
         break;
       case "highlighter":
-        p5.stroke(255, 255, 0, 32);
-        p5.strokeWeight(30);
+        p5.stroke(255, 255, 0, 20);
+        p5.strokeWeight(20);
         p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
         // console.log("highlighter");
         break;
