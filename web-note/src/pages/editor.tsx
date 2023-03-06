@@ -106,10 +106,10 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
 
   useEffect(() => {
     const storageChangeHandler = (event: Event) => {
+      console.log("storageChangeHandler", event);
       if (!(event instanceof StorageEvent)) return;
       if (!img || img !== "loadFromLocalStorage") return;
       if (event.key !== "imageFromExtension") return;
-      console.log("storageChangeHandler", event);
       if (!event.newValue) return;
       setDefaultImageData(event.newValue);
     }
@@ -118,27 +118,13 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
       console.log("found value without change handler", currValue);
       setDefaultImageData(currValue);
     } else {
+      console.log("register storage listener");
       document.addEventListener("storage", storageChangeHandler);
     }
     return () => {
       document.removeEventListener("storage", storageChangeHandler);
     }
   }, [img]);
-
-  // console.log("loggin", img);
-  // useEffect(() => {
-  //   if (!img) return;
-  //   if (img !== "loadFromLocalStorage") return;
-  //   if (defaultImageData) return;
-  //   void delay(500).then(() => {
-  //     const data = localStorage.getItem("imageFromExtension");
-  //     console.log("test", data);
-  //     if (data) {
-  //       setDefaultImageData(data);
-  //       //localStorage.removeItem("imageFromExtension");
-  //     }
-  //   });
-  // }, [img, defaultImageData]);
 
   const [activeTool, setActiveTool] = useState<Tool>(tools[0]);
   const [showExportOption, setShowExportOption] = useState(false);
