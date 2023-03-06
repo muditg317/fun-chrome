@@ -3,7 +3,7 @@ const path = require("path");
 const CopyPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-const config = {
+const config = (env,argv) => ({
   entry: {
     popup: path.join(__dirname, "src/popup.tsx"),
     content: path.join(__dirname, "src/scripts/content-script.ts"),
@@ -85,6 +85,6 @@ const config = {
     }),
     new MiniCssExtractPlugin()
   ],
-};
+});
 
 module.exports = config;

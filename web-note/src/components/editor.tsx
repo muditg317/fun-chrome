@@ -1,15 +1,15 @@
 /* eslint @typescript-eslint/restrict-template-expressions: "warn" */
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 
 import type p5 from "p5";
-import P5Sketch from "~/components/p5-sketch";
+import P5Sketch, {type P5SketchRefType} from "~/components/p5-sketch";
 import dummyImg from "~/assets/dummyImg.png";
 import useP5Event from "~/hooks/useP5Event";
 
-const WIDTH = 500;
-const HEIGHT = 500;
+const MAX_WIDTH = 800;
+// const HEIGHT = 500;
 const INTERACTION_MARGIN = 5;
-const INTERACTION_BOUNDS = [-INTERACTION_MARGIN, WIDTH+INTERACTION_MARGIN, -INTERACTION_MARGIN, HEIGHT+INTERACTION_MARGIN] as const;
+// const INTERACTION_BOUNDS = [-INTERACTION_MARGIN, WIDTH+INTERACTION_MARGIN, -INTERACTION_MARGIN, HEIGHT+INTERACTION_MARGIN] as const;
 
 const TOOLS = [
   "pen",
@@ -27,6 +27,7 @@ interface EditorProps {
 
 const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool, baseImage }: EditorProps) => {
   const backgroundImageRef = useRef<p5.Image>();
+  const p5Ref = useRef<P5SketchRefType>();
 
   const preload = useCallback((p5: p5) => {
     console.log("running preload");
@@ -37,10 +38,25 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool,
     } else {
       backgroundImageRef.current = p5.loadImage(dummyImg.src);
     }
-  }, [baseImage])
+  }, [baseImage]);
+
+  const INTERACTION_BOUNDS: readonly [number, number, number, number] = useMemo(() => {
+    if (!p5Ref.current) return [-INTERACTION_MARGIN, INTERACTION_MARGIN, -INTERACTION_MARGIN, INTERACTION_MARGIN];
+    return [
+      -INTERACTION_MARGIN,
+      p5Ref.current.width + INTERACTION_MARGIN,
+      -INTERACTION_MARGIN,
+      p5Ref.current.height + INTERACTION_MARGIN,
+    ]
+  }, [p5Ref.current]);
 
   const setup = useCallback((p5: p5, parent: HTMLDivElement) => {
-    canvasRendererRef.current = p5.createCanvas(WIDTH,HEIGHT);
+    const background = backgroundImageRef.current!;
+    let scale = 1;
+    if (background.width > MAX_WIDTH) {
+      scale = MAX_WIDTH / background.width;
+    }
+    canvasRendererRef.current = p5.createCanvas(background.width*scale,background.height*scale);
     // console.log(canvasRendererRef.current.elt);
     // console.log(parent);
     canvasRendererRef.current.parent(parent);
@@ -68,7 +84,7 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool,
         // console.log("highlighter");
         break;
       case "eraser":
-        backgroundImageRef.current && p5.image(backgroundImageRef.current, p5.mouseX - 10, p5.mouseY - 10, 20, 20, (p5.mouseX - 10) / WIDTH * backgroundImageRef.current.width , (p5.mouseY - 10) / HEIGHT * backgroundImageRef.current.height, 20 / WIDTH * backgroundImageRef.current.width, 20 / HEIGHT * backgroundImageRef.current.height);
+        backgroundImageRef.current && p5.image(backgroundImageRef.current, p5.mouseX - 10, p5.mouseY - 10, 20, 20, (p5.mouseX - 10) / p5.width * backgroundImageRef.current.width , (p5.mouseY - 10) / p5.height * backgroundImageRef.current.height, 20 / p5.width * backgroundImageRef.current.width, 20 / p5.height * backgroundImageRef.current.height);
         // console.log("eraser");
         break;
       default:
@@ -80,7 +96,7 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool,
   const touchMoved = mouseDragged;
 
   return (
-    <P5Sketch className={`the-sketch`} { ...{ preload, setup, mouseDragged, touchMoved } } width={`${WIDTH}`} height={`${HEIGHT}`} />
+    <P5Sketch className={`the-sketch`} { ...{ preload, setup, mouseDragged, touchMoved, p5Ref } } />
   );
 };
 

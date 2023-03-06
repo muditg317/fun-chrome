@@ -2,8 +2,7 @@
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import Image from "next/image";
-import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type p5 from "p5";
 import {sha256} from "crypto-hash";
 
@@ -14,7 +13,7 @@ import PenIcon from "~/assets/penicon.svg";
 import HighlighterIcon from "~/assets/markericon.svg";
 import EraserIcon from "~/assets/erasoricon.svg";
 import Link from "next/link";
-import { GetServerSideProps, NextPage } from "next";
+import { type GetServerSideProps, type NextPage } from "next";
 
 // import EditorComponent from "~/components/editor";
 const EditorComponent = dynamic(() => import("~/components/editor"), { ssr: false });
@@ -48,7 +47,7 @@ function shareCanvasData(canvasViewString: string) {
   // currURL.searchParams.set("img", imgData);
 
   console.log(canvasViewString);
-  navigator.clipboard.writeText(canvasViewString);
+  void navigator.clipboard.writeText(canvasViewString);
 }
 function saveCanvasToImg(canvas: HTMLCanvasElement) {
   canvas.toBlob((blob) => {
@@ -79,11 +78,15 @@ type EditorProps = {
 
 
 export const getServerSideProps: GetServerSideProps<EditorProps> =
-  async context => ({ props: {
+  context => Promise.resolve({ props: {
     host: !context.req.headers.host ? null : `${context.req.headers.referer ? (new URL(context.req.headers.referer)).protocol : "http://"}${context.req.headers.host}`,
     title: (context.query.title as string) || "Untitled",
     img: (context.query.img as string) || null,
   } });
+
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) => {
   const canvasRef = useRef<p5.Renderer>();
@@ -92,18 +95,39 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
 
   const [defaultImageData, setDefaultImageData] = useState<string>("");
 
-  console.log("loggin", img);
-  useEffect(() => {
-    if (!img) return;
-    if (img !== "loadFromLocalStorage") return;
-    if (defaultImageData) return;
-    const data = localStorage.getItem("imageFromExtension");
-    console.log("test", data);
-    if (data) {
-      setDefaultImageData(data);
-      //localStorage.removeItem("imageFromExtension");
+  const loadStoredData = useCallback((storedValue: string) => {
+    // if (defaultImageData) return;
+    // console.log("loadStoredData", storedValue);
+    if (storedValue) {
+      setDefaultImageData(storedValue);
+      localStorage.removeItem("imageFromExtension");
     }
-  }, [img, defaultImageData]);
+  }, []);
+
+  useEffect(() => {
+    const storageChangeHandler = (event: Event) => {
+      console.log("storageChangeHandler", event);
+      if (!(event instanceof StorageEvent)) return;
+      if (!img || img !== "loadFromLocalStorage") return;
+      if (event.key !== "imageFromExtension") return;
+      if (!event.newValue) return;
+      loadStoredData(event.newValue);
+    }
+    void delay(1000).then(() => {
+      const currValue = localStorage.getItem("imageFromExtension");
+      if (currValue) {
+        console.log("found value without change handler");
+        loadStoredData(currValue);
+      } else {
+        console.log("register storage listener");
+        document.addEventListener("storage", storageChangeHandler);
+      }
+    });
+    return () => {
+      console.log("unregister storage listener");
+      document.removeEventListener("storage", storageChangeHandler);
+    }
+  }, [img]);
 
   const [activeTool, setActiveTool] = useState<Tool>(tools[0]);
   const [showExportOption, setShowExportOption] = useState(false);
@@ -153,10 +177,10 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
         <div className="flex items-center gap-4">
           <div className="relative" ref={exportWrapperRef}>
             <button className={`flex items-center gap-2 px-4 py-2 text-white bg-[#727780] rounded-t-md ${showExportOption ? "": "rounded-b-md"} hover:bg-[#9498a0]`}
-              onClick={async () => {
+              onClick={() => {
                 setShowExportOption(prev => !prev);
                 if (!showExportOption) {
-                  await updateShareLink(canvasRef.current?.elt as HTMLCanvasElement);
+                  void updateShareLink(canvasRef.current?.elt as HTMLCanvasElement);
                 }
               }}
             >
@@ -182,7 +206,7 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
                   <div className="flex flex-row gap-2">
                     <input className="text-white" name="share-link" id="share-link" value={`${shareLink}`} disabled></input>
                     <button className="flex items-center gap-2 px-2 py-2 text-white bg-[#727780] rounded-md hover:bg-[#9498a0]"
-                      onClick={async () => {
+                      onClick={() => {
                         shareCanvasData(shareLink);
                       }}
                     >
@@ -217,7 +241,9 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
           ))}
         </div>
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-          <EditorComponent canvasRendererRef={canvasRef} activeTool={activeTool.name} baseImage={defaultImageData} />
+          {(defaultImageData || title==="Untitled") &&
+            <EditorComponent canvasRendererRef={canvasRef} activeTool={activeTool.name} baseImage={defaultImageData} />
+          }
         </div>
       </main>
     </>
