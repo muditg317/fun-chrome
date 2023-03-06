@@ -95,20 +95,50 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
 
   const [defaultImageData, setDefaultImageData] = useState<string>("");
 
-  console.log("loggin", img);
+  // const loadStoredData = useCallback((storedValue: string) => {
+  //   // if (defaultImageData) return;
+  //   // console.log("loadStoredData", storedValue);
+  //   if (storedValue) {
+  //     setDefaultImageData(storedValue);
+  //     // localStorage.removeItem("imageFromExtension");
+  //   }
+  // }, [defaultImageData]);
+
   useEffect(() => {
-    if (!img) return;
-    if (img !== "loadFromLocalStorage") return;
-    if (defaultImageData) return;
-    void delay(500).then(() => {
-      const data = localStorage.getItem("imageFromExtension");
-      console.log("test", data);
-      if (data) {
-        setDefaultImageData(data);
-        //localStorage.removeItem("imageFromExtension");
-      }
-    });
-  }, [img, defaultImageData]);
+    const storageChangeHandler = (event: Event) => {
+      if (!(event instanceof StorageEvent)) return;
+      if (!img || img !== "loadFromLocalStorage") return;
+      if (event.key !== "imageFromExtension") return;
+      console.log("storageChangeHandler", event);
+      if (!event.newValue) return;
+      setDefaultImageData(event.newValue);
+    }
+    const currValue = localStorage.getItem("imageFromExtension");
+    if (currValue) {
+      console.log("found value without change handler", currValue);
+      setDefaultImageData(currValue);
+    } else {
+      document.addEventListener("storage", storageChangeHandler);
+    }
+    return () => {
+      document.removeEventListener("storage", storageChangeHandler);
+    }
+  }, [img]);
+
+  // console.log("loggin", img);
+  // useEffect(() => {
+  //   if (!img) return;
+  //   if (img !== "loadFromLocalStorage") return;
+  //   if (defaultImageData) return;
+  //   void delay(500).then(() => {
+  //     const data = localStorage.getItem("imageFromExtension");
+  //     console.log("test", data);
+  //     if (data) {
+  //       setDefaultImageData(data);
+  //       //localStorage.removeItem("imageFromExtension");
+  //     }
+  //   });
+  // }, [img, defaultImageData]);
 
   const [activeTool, setActiveTool] = useState<Tool>(tools[0]);
   const [showExportOption, setShowExportOption] = useState(false);
