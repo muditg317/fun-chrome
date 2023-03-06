@@ -2,8 +2,7 @@
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import Image from "next/image";
-import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type p5 from "p5";
 import {sha256} from "crypto-hash";
 
@@ -14,7 +13,7 @@ import PenIcon from "~/assets/penicon.svg";
 import HighlighterIcon from "~/assets/markericon.svg";
 import EraserIcon from "~/assets/erasoricon.svg";
 import Link from "next/link";
-import { GetServerSideProps, NextPage } from "next";
+import { type GetServerSideProps, type NextPage } from "next";
 
 // import EditorComponent from "~/components/editor";
 const EditorComponent = dynamic(() => import("~/components/editor"), { ssr: false });
@@ -85,6 +84,10 @@ export const getServerSideProps: GetServerSideProps<EditorProps> =
     img: (context.query.img as string) || null,
   } });
 
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) => {
   const canvasRef = useRef<p5.Renderer>();
 
@@ -97,12 +100,14 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
     if (!img) return;
     if (img !== "loadFromLocalStorage") return;
     if (defaultImageData) return;
-    const data = localStorage.getItem("imageFromExtension");
-    console.log("test", data);
-    if (data) {
-      setDefaultImageData(data);
-      //localStorage.removeItem("imageFromExtension");
-    }
+    void delay(500).then(() => {
+      const data = localStorage.getItem("imageFromExtension");
+      console.log("test", data);
+      if (data) {
+        setDefaultImageData(data);
+        //localStorage.removeItem("imageFromExtension");
+      }
+    });
   }, [img, defaultImageData]);
 
   const [activeTool, setActiveTool] = useState<Tool>(tools[0]);

@@ -2,7 +2,11 @@ import * as React from "react";
 import logo from "../../assets/images/logo.svg";
 import "./popup.css";
 
+const isProd = process.env.NODE_ENV === "production";
+const HOST_NAME = isProd ? "https://webnote.mudit.tech" : "http://localhost:3000";
+
 const popupApp = () => {
+  console.log(HOST_NAME)
   return (
     <div className="popup">
       <header className="popup-header">
@@ -13,7 +17,7 @@ const popupApp = () => {
             var tabTitle = tabs[0].title;
             chrome.windows.getCurrent(function(window) {
               chrome.tabs.captureVisibleTab(window.id, function(dataUrl) {
-                let newURL = `http://localhost:3000/editor?title=${tabTitle}&img=loadFromLocalStorage`;
+                let newURL = `${HOST_NAME}/editor?title=${tabTitle}&img=loadFromLocalStorage`;
                 chrome.tabs.create(
                   {"url": newURL,active:false},(tab) => {
                       setTimeout(()=>{
