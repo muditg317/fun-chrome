@@ -48,7 +48,7 @@ function shareCanvasData(canvasViewString: string) {
   // currURL.searchParams.set("img", imgData);
 
   console.log(canvasViewString);
-  navigator.clipboard.writeText(canvasViewString);
+  void navigator.clipboard.writeText(canvasViewString);
 }
 function saveCanvasToImg(canvas: HTMLCanvasElement) {
   canvas.toBlob((blob) => {
@@ -79,7 +79,7 @@ type EditorProps = {
 
 
 export const getServerSideProps: GetServerSideProps<EditorProps> =
-  async context => ({ props: {
+  context => Promise.resolve({ props: {
     host: !context.req.headers.host ? null : `${context.req.headers.referer ? (new URL(context.req.headers.referer)).protocol : "http://"}${context.req.headers.host}`,
     title: (context.query.title as string) || "Untitled",
     img: (context.query.img as string) || null,
@@ -153,10 +153,10 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
         <div className="flex items-center gap-4">
           <div className="relative" ref={exportWrapperRef}>
             <button className={`flex items-center gap-2 px-4 py-2 text-white bg-[#727780] rounded-t-md ${showExportOption ? "": "rounded-b-md"} hover:bg-[#9498a0]`}
-              onClick={async () => {
+              onClick={() => {
                 setShowExportOption(prev => !prev);
                 if (!showExportOption) {
-                  await updateShareLink(canvasRef.current?.elt as HTMLCanvasElement);
+                  void updateShareLink(canvasRef.current?.elt as HTMLCanvasElement);
                 }
               }}
             >
@@ -182,7 +182,7 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
                   <div className="flex flex-row gap-2">
                     <input className="text-white" name="share-link" id="share-link" value={`${shareLink}`} disabled></input>
                     <button className="flex items-center gap-2 px-2 py-2 text-white bg-[#727780] rounded-md hover:bg-[#9498a0]"
-                      onClick={async () => {
+                      onClick={() => {
                         shareCanvasData(shareLink);
                       }}
                     >
