@@ -1,8 +1,8 @@
 /* eslint @typescript-eslint/restrict-template-expressions: "warn" */
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 
 import type p5 from "p5";
-import P5Sketch from "~/components/p5-sketch";
+import P5Sketch, {type P5SketchRefType} from "~/components/p5-sketch";
 import dummyImg from "~/assets/dummyImg.png";
 import useP5Event from "~/hooks/useP5Event";
 
@@ -27,6 +27,7 @@ interface EditorProps {
 
 const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool, baseImage }: EditorProps) => {
   const backgroundImageRef = useRef<p5.Image>();
+  const p5Ref = useRef<P5SketchRefType>();
 
   const preload = useCallback((p5: p5) => {
     console.log("running preload");
@@ -37,7 +38,11 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool,
     } else {
       backgroundImageRef.current = p5.loadImage(dummyImg.src);
     }
-  }, [baseImage])
+  }, [baseImage]);
+
+  // useEffect(() => {
+
+  // }, [baseImage]);
 
   const setup = useCallback((p5: p5, parent: HTMLDivElement) => {
     canvasRendererRef.current = p5.createCanvas(WIDTH,HEIGHT);
@@ -80,7 +85,7 @@ const EditorComponent: React.FC<EditorProps> = ({ canvasRendererRef, activeTool,
   const touchMoved = mouseDragged;
 
   return (
-    <P5Sketch className={`the-sketch`} { ...{ preload, setup, mouseDragged, touchMoved } } width={`${WIDTH}`} height={`${HEIGHT}`} />
+    <P5Sketch className={`the-sketch`} { ...{ preload, setup, mouseDragged, touchMoved, p5Ref } } width={`${WIDTH}`} height={`${HEIGHT}`} />
   );
 };
 

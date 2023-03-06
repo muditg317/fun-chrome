@@ -2,11 +2,10 @@ import * as React from "react";
 import logo from "../../assets/images/logo.svg";
 import "./popup.css";
 
-const isProd = process.env.NODE_ENV === "production";
+const isProd = process.env.NODE_ENV === "production" && false;
 const HOST_NAME = isProd ? "https://webnote.mudit.tech" : "http://localhost:3000";
 
 const popupApp = () => {
-  console.log(HOST_NAME)
   return (
     <div className="popup">
       <header className="popup-header">
@@ -23,9 +22,9 @@ const popupApp = () => {
                       setTimeout(()=>{
                           chrome.tabs.sendMessage(tab.id!,dataUrl,(resp) => {
                             console.log("recieved");
-                              chrome.tabs.update(tab.id!,{active: true});
+                            chrome.tabs.update(tab.id!,{active: true});
                           });
-                      },500);
+                      },1000);
                   }
                 );
               });

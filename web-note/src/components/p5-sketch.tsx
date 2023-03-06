@@ -46,6 +46,7 @@ type P5SketchProps = {
   id?: string,
   className?: string,
   style?: object,
+  p5Ref: MutableRefObject<p5 | undefined>,
 } & Partial<HandlerRecord>;
 
 type addPrefixToObject<T, P extends string> = {
@@ -54,7 +55,7 @@ type addPrefixToObject<T, P extends string> = {
 
 type InternalP5EventRecord = addPrefixToObject<HandlerRecord, '_internal_'>;
 
-type P5SketchRefType = p5 & Partial<InternalP5EventRecord>;
+export type P5SketchRefType = p5 & Partial<InternalP5EventRecord>;
 
 export default function P5Sketch(props: P5SketchProps) {
   const {
@@ -63,6 +64,7 @@ export default function P5Sketch(props: P5SketchProps) {
     id,
     className = "react-p5",
     style,
+    p5Ref,
     ...events
   } = props;
 

@@ -95,14 +95,14 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
 
   const [defaultImageData, setDefaultImageData] = useState<string>("");
 
-  // const loadStoredData = useCallback((storedValue: string) => {
-  //   // if (defaultImageData) return;
-  //   // console.log("loadStoredData", storedValue);
-  //   if (storedValue) {
-  //     setDefaultImageData(storedValue);
-  //     // localStorage.removeItem("imageFromExtension");
-  //   }
-  // }, [defaultImageData]);
+  const loadStoredData = useCallback((storedValue: string) => {
+    // if (defaultImageData) return;
+    // console.log("loadStoredData", storedValue);
+    if (storedValue) {
+      setDefaultImageData(storedValue);
+      localStorage.removeItem("imageFromExtension");
+    }
+  }, []);
 
   useEffect(() => {
     const storageChangeHandler = (event: Event) => {
@@ -111,17 +111,20 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
       if (!img || img !== "loadFromLocalStorage") return;
       if (event.key !== "imageFromExtension") return;
       if (!event.newValue) return;
-      setDefaultImageData(event.newValue);
+      loadStoredData(event.newValue);
     }
-    const currValue = localStorage.getItem("imageFromExtension");
-    if (currValue) {
-      console.log("found value without change handler", currValue);
-      setDefaultImageData(currValue);
-    } else {
-      console.log("register storage listener");
-      document.addEventListener("storage", storageChangeHandler);
-    }
+    void delay(1000).then(() => {
+      const currValue = localStorage.getItem("imageFromExtension");
+      if (currValue) {
+        console.log("found value without change handler", currValue);
+        loadStoredData(currValue);
+      } else {
+        console.log("register storage listener");
+        document.addEventListener("storage", storageChangeHandler);
+      }
+    });
     return () => {
+      console.log("unregister storage listener");
       document.removeEventListener("storage", storageChangeHandler);
     }
   }, [img]);
@@ -238,7 +241,9 @@ const Editor: NextPage<EditorProps> = ({title, host: _host, img}: EditorProps) =
           ))}
         </div>
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-          <EditorComponent canvasRendererRef={canvasRef} activeTool={activeTool.name} baseImage={defaultImageData} />
+          {defaultImageData &&
+            <EditorComponent canvasRendererRef={canvasRef} activeTool={activeTool.name} baseImage={defaultImageData} />
+          }
         </div>
       </main>
     </>
