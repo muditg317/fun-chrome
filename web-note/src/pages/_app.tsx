@@ -1,10 +1,16 @@
 import { type AppType } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
+import {Varela_Round} from "next/font/google";
 
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
+
+const font = Varela_Round({
+  subsets: ['latin'],
+  weight: "400"
+})
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -12,7 +18,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <SessionProvider session={session}>
-      <Component {...pageProps} />
+      <div className={font.className}>
+        <Component {...pageProps} />
+      </div>
     </SessionProvider>
   );
 };
