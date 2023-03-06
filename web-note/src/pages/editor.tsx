@@ -2,14 +2,19 @@
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type p5 from "p5";
+import {sha256} from "crypto-hash";
 
 import DownloadIcon from "~/assets/downloadicon.svg";
+import ShareIcon from "~/assets/shareicon.svg";
+import CancelIcon from "~/assets/cancelicon.svg";
 import PenIcon from "~/assets/penicon.svg";
 import HighlighterIcon from "~/assets/markericon.svg";
 import EraserIcon from "~/assets/erasoricon.svg";
 import Link from "next/link";
+import { GetServerSideProps, NextPage } from "next";
 
 // import EditorComponent from "~/components/editor";
 const EditorComponent = dynamic(() => import("~/components/editor"), { ssr: false });
@@ -35,13 +40,23 @@ const tools = [
 
 type Tool = typeof tools[number];
 
-function postCanvasToURL(canvas: HTMLCanvasElement) {
+function shareCanvasData(canvasViewString: string) {
+  // const currURL = new URL(window.location.href);
+  // console.log(currURL.toString());
+
+  // const imgData = canvas.toDataURL("image/jpeg", 0.1);
+  // currURL.searchParams.set("img", imgData);
+
+  console.log(canvasViewString);
+  navigator.clipboard.writeText(canvasViewString);
+}
+function saveCanvasToImg(canvas: HTMLCanvasElement) {
   canvas.toBlob((blob) => {
     if (!blob) return;    
     const element = document.createElement('a');
     const url  = window.URL.createObjectURL(blob);
 
-    console.log(url);
+    // console.log(url);
 
     element.setAttribute('href', url);
     element.setAttribute('download', "annotated.jpg");
@@ -56,10 +71,58 @@ function postCanvasToURL(canvas: HTMLCanvasElement) {
   }, 'image/jpeg');
 }
 
-const Editor: React.FC = () => {
+type Nullable<T> = {
+  [P in keyof T]: T[P] | null;
+}
+type EditorProps = Nullable<{
+  title: string,
+  host: string,
+}>
+
+
+export const getServerSideProps: GetServerSideProps<EditorProps> =
+  async context => ({ props: {
+    host: !context.req.headers.host ? null : `${context.req.headers.referer ? (new URL(context.req.headers.referer)).protocol : "http://"}${context.req.headers.host}`,
+    title: (context.query.title as string) || null,
+  } });
+
+const Editor: NextPage<EditorProps> = ({title: _title, host: _host}: EditorProps) => {
   const canvasRef = useRef<p5.Renderer>();
 
+  const title = _title || "Untitled";
+  const host = _host || "http://fallback.com";
+
   const [activeTool, setActiveTool] = useState<Tool>(tools[0]);
+  const [showExportOption, setShowExportOption] = useState(false);
+  const exportWrapperRef = useRef<HTMLDivElement>(null);
+
+  const [shareLink, setShareLink] = useState<string>("");
+
+  const updateShareLink = useCallback(async (canvas?: HTMLCanvasElement) => {
+    const currURL = new URL(host);
+    currURL.pathname = "/viewer";
+    // console.log(currURL);
+    if (!canvas) return currURL.toString();
+    const imgData = canvas.toDataURL("image/jpeg", 0.5);
+    const hashed = await sha256(imgData);
+    currURL.searchParams.set("img", hashed);
+    // console.log(currURL.toString());
+    // return currURL.toString();
+    setShareLink(currURL.toString());
+  }, [host]);
+  // console.log(`shareLink: |${shareLink}|`);
+
+  useEffect(() => {
+    const documentClickHandler = (event: Event) => {
+      if (showExportOption && exportWrapperRef.current && !exportWrapperRef.current.contains(event.target as Node)) {
+        setShowExportOption(false);
+      }
+    }
+    document.addEventListener("click", documentClickHandler);
+    return () => {
+      document.removeEventListener("click", documentClickHandler);
+    }
+  }, [showExportOption]);
 
   return (
     <>
@@ -75,14 +138,57 @@ const Editor: React.FC = () => {
           <h1 className="text-2xl font-bold text-white">Web Note</h1>
         </Link>
         <div className="flex items-center gap-4">
-          <button className="flex items-center gap-2 px-4 py-2 text-white bg-[#727780] rounded-md hover:bg-[#9498a0]"
-            onClick={() => {
-              postCanvasToURL(canvasRef.current!.elt as HTMLCanvasElement);
-            }}
-          >
-            <span>Download</span>
-            <Icon icon={DownloadIcon} alt="Download" />
-          </button>
+          <div className="relative" ref={exportWrapperRef}>
+            <button className={`flex items-center gap-2 px-4 py-2 text-white bg-[#727780] rounded-t-md ${showExportOption ? "": "rounded-b-md"} hover:bg-[#9498a0]`}
+              onClick={async () => {
+                setShowExportOption(prev => !prev);
+                if (!showExportOption) {
+                  await updateShareLink(canvasRef.current?.elt as HTMLCanvasElement);
+                }
+              }}
+            >
+              <span>Export</span>
+              {/* <Icon icon={DownloadIcon} alt="Download" /> */}
+            </button>
+            {true && (
+              <div className={`${showExportOption ? "block" : "hidden"} relative z-10`}>
+                <div className="absolute top-0 right-0 flex flex-col gap-4 bg-[#818181] w-fit min-w-48 rounded-md rounded-tr-none shadow-md p-4">
+                  <div className="flex flex-row justify-between">
+                    <span className="flex flex-row gap-1">
+                      <Icon icon={ShareIcon} alt="Share" />
+                      <p className="text-white whitespace-nowrap text-ellipsis max-w-[20ex] overflow-hidden">{title ? `Share ${title}` : "Share"}</p>
+                    </span>
+                    <button className="text-white"
+                      onClick={() => {
+                        setShowExportOption(false);
+                      }}
+                    >
+                      <Icon icon={CancelIcon} alt="Cancel export" size={15} />
+                    </button>
+                  </div>
+                  <div className="flex flex-row gap-2">
+                    <input className="text-white" name="share-link" id="share-link" value={`${shareLink}`} disabled></input>
+                    <button className="flex items-center gap-2 px-2 py-2 text-white bg-[#727780] rounded-md hover:bg-[#9498a0]"
+                      onClick={async () => {
+                        shareCanvasData(shareLink);
+                      }}
+                    >
+                      <span>Copy</span>
+                      {/* <Icon icon={CopyIcon} alt="Copy" /> */}
+                    </button>
+                  </div>
+                  <button className="flex self-end items-center gap-2 px-4 py-2 w-fit text-white bg-[#727780] rounded-md hover:bg-[#9498a0]"
+                    onClick={() => {
+                      saveCanvasToImg(canvasRef.current!.elt as HTMLCanvasElement);
+                    }}
+                  >
+                    <Icon icon={DownloadIcon} alt="Download" />
+                    <span>Download</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </header>
       <main className="flex min-h-screen flex-col items-center justify-center bg-[#292B2E] relative">
