@@ -11,7 +11,7 @@ chrome.tabs.onCreated.addListener(async (tab) => {
 
 chrome.tabs.onRemoved.addListener(async (tabId) => {
   console.log(`Tab removed: ${tabId}`);
-  chrome.tts.speak("bye!", {
-    rate: 5.0,
-  });
+  //chrome.tts.speak("", {
+  //  rate: 1.5,
+  //});
 });
