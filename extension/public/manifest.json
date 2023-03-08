@@ -10,10 +10,7 @@
   },
   "permissions": [
     "tabs",
-    "activeTab",
-    "scripting",
-    "tts",
-    "ttsEngine"
+    "activeTab"
   ],
   "action": {
     "default_icon": {
@@ -44,24 +41,7 @@
   "content_scripts": [
     {
       "matches": [
-        "*://*/*"
-      ],
-      "js": [
-        "content.js"
-      ]
-    },
-    {
-      "matches": [
-        "*://*/*"
-      ],
-      "css": [
-        "fun-chrome-effects.css"
-      ]
-    },
-    {
-      "matches": [
-        "*://webnote.mudit.tech/*",
-        "*://localhost:*/*"
+        "https://webnote.mudit.tech/*"
       ],
       "js": [
         "content-webnote.js"
